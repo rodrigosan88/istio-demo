@@ -1,9 +1,14 @@
 package com.example.demoistio;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
@@ -16,9 +21,18 @@ public class DemoistioApplication {
 	
     @Bean 
     public RestTemplate restTemplate() {
-        RestTemplate template = new RestTemplate();
+        RestTemplate restTemplate = new RestTemplate();
 
-        return template;
+        List<ClientHttpRequestInterceptor> interceptors = restTemplate.getInterceptors();
+        
+        if (CollectionUtils.isEmpty(interceptors)) {
+            interceptors = new ArrayList<>();
+        }
+        
+        interceptors.add(new RestTemplateHeaderModifierInterceptor());
+        restTemplate.setInterceptors(interceptors);
+        
+        return restTemplate;
     }
 
 }
